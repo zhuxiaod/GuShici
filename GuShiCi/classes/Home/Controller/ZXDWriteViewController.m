@@ -238,6 +238,7 @@ static NSString *collectionViewID = @"CollectionCell";
     _hanZi = hanZi;
     //显示当前字的线条
     self.drawView.ZXDNewAllPath = _hanZi.allPath;
+    
     //显示背景
     _backGroundlabel.text = hanZi.ZXDhanZi;
     if(self.selected != 0){
