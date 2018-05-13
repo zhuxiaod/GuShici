@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>cellImage</key>
+		<string>QQ20180407-3</string>
+		<key>musicName</key>
+		<string>123</string>
+	</dict>
+	<dict>
+		<key>cellImage</key>
+		<string>QQ20180407-4</string>
+		<key>musicName</key>
+		<string>春咏</string>
+	</dict>
+	<dict>
+		<key>cellImage</key>
+		<string>QQ20180407-5</string>
+		<key>musicName</key>
+		<string>鹅鹅鹅</string>
+	</dict>
+	<dict>
+		<key>cellImage</key>
+		<string>QQ20180407-2</string>
+		<key>musicName</key>
+		<string>别董大</string>
+	</dict>
+	<dict>
+		<key>cellImage</key>
+		<string>QQ20180407-0</string>
+		<key>musicName</key>
+		<string>停车</string>
+	</dict>
+	<dict>
+		<key>cellImage</key>
+		<string>QQ20180407-1</string>
+		<key>musicName</key>
+		<string>不知道了～</string>
+	</dict>
+</array>
+</plist>

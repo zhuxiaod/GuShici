@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>btnImage</key>
+		<string>QQ20180407-3</string>
+		<key>btnTittle</key>
+		<string>639</string>
+	</dict>
+	<dict>
+		<key>btnTittle</key>
+		<string>zxd</string>
+		<key>btnImage</key>
+		<string>QQ20180407-4</string>
+	</dict>
+	<dict>
+		<key>btnTittle</key>
+		<string>asd</string>
+		<key>btnImage</key>
+		<string>QQ20180407-5</string>
+	</dict>
+	<dict>
+		<key>btnTittle</key>
+		<string>88</string>
+		<key>btnImage</key>
+		<string>QQ20180407-2</string>
+	</dict>
+	<dict>
+		<key>btnTittle</key>
+		<string>77</string>
+		<key>btnImage</key>
+		<string>QQ20180407-0</string>
+	</dict>
+	<dict>
+		<key>btnTittle</key>
+		<string>123</string>
+		<key>btnImage</key>
+		<string>QQ20180407-1</string>
+	</dict>
+</array>
+</plist>

@@ -1,0 +1,16 @@
+platform :ios, '7.0'
+target 'GuShiCi' do
+pod 'IQKeyboardManager'
+pod 'AFNetworking', '~> 3.2.0'
+pod 'MJExtension', '~> 3.0.13'
+pod 'SDWebImage', '~> 4.3.3'
+pod 'MJExtension', '~> 3.0.13'
+pod ‘ZFPlayer’,'~> 2.1.6 '
+pod 'MBProgressHUD'
+pod 'Toast','~> 4.0.0'
+pod 'Reachability'
+pod 'FDFullscreenPopGesture'
+pod 'MJRefresh'
+pod 'Masonry'
+pod 'FMDB'
+end

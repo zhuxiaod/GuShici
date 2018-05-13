@@ -1,0 +1,42 @@
+//
+//  GuShiCi.pch
+//  GuShiCi
+//
+//  Created by zxd on 2018/4/24.
+//  Copyright © 2018年 zxd. All rights reserved.
+//
+
+#ifndef GuShiCi_pch
+#define GuShiCi_pch
+
+#import <MJRefresh.h>
+#import <MBProgressHUD.h>
+#import "MBProgressHUD+ZXD.h"
+//#import "ZXDBaseLoadController.h"
+#import "LMJRequestManager.h"
+#import <AFNetworking.h>
+#import "LMJConst.h"
+#import <MJExtension/MJExtension.h>
+#import <Toast.h>
+#import <SDWebImage/UIImageView+WebCache.h>
+#import <FMDB/FMDB.h>
+#import "ZXDWriteViewController.h"
+#import "ZXDPutInTextViewController.h"
+#import "UIImage+ImageFromString.h"
+#import "HBBallColorModel.h"
+#import "ZXCustomWindow.h"
+#import "CABasicAnimation+Poziton.h"
+#import "UIBarButtonItem+Item.h"
+
+//是否是空对象
+#define LMJIsEmpty(_object) (_object == nil \
+|| [_object isKindOfClass:[NSNull class]] \
+|| ([_object respondsToSelector:@selector(length)] && [(NSData *)_object length] == 0) \
+|| ([_object respondsToSelector:@selector(count)] && [(NSArray *)_object count] == 0))
+
+#define ZXDWeak(type)  __weak typeof(type) weak##type = type
+
+#define ZXDScreenW [UIScreen mainScreen].bounds.size.width
+#define ZXDScreenH [UIScreen mainScreen].bounds.size.height
+
+#endif /* GuShiCi_pch */
