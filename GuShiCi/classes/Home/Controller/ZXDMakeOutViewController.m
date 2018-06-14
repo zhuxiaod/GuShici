@@ -112,7 +112,6 @@ static NSString *collectionID = @"collectionID";
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-
     BtnCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:collectionID forIndexPath:indexPath];
     cell.cellData = self.dataArr[indexPath.row];
     return cell;

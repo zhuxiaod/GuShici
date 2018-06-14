@@ -15,4 +15,6 @@
 
 @property(nonatomic,strong)ZXDMusic *currentmusic;
 
+@property(nonatomic,strong)NSMutableArray *array;
+
 @end

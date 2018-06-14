@@ -106,28 +106,9 @@
 
     //2:nav2
     UINavigationController *nav2 = self.childViewControllers[2];
-    nav2.tabBarItem.title = @"我";
+    nav2.tabBarItem.title = @"关于";
     nav2.tabBarItem.image = [UIImage imageOriginalWithName:@"tabBar_friendTrends_icon"];
     nav2.tabBarItem.selectedImage = [UIImage imageOriginalWithName:@"tabBar_friendTrends_click_icon"];
 }
-#warning 视频看到9了。看完关于navigation的东西 开始做tab吧～
-
-
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

@@ -42,6 +42,7 @@
 {
     CGSize cSize=self.bounds.size;
 
+    //写2个button进去
     _lastBtn=[[ZXDConsoleBtn alloc] initWithFrame:CGRectMake(10, (cSize.height-smallBtnWidth)/2, smallBtnWidth, smallBtnWidth) ConsoleType:ZXDConsoleBtnTypeLast];
     [_lastBtn addTarget:self action:@selector(btnClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_lastBtn];

@@ -31,15 +31,13 @@ NSString *RecordListID = @"RecordList";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor redColor];
+    self.view.backgroundColor = [UIColor whiteColor];
 
-    
-    //沙盒路径
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    NSString *filename = [path stringByAppendingPathComponent:@"data.db"];
+    //本地文件的路径
+    NSString *string = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"db"];
     
     //1.创建数据库队列
-    self.queue = [FMDatabaseQueue databaseQueueWithPath:filename];
+    self.queue = [FMDatabaseQueue databaseQueueWithPath:string];
     //2.创建表
     [self.queue inDatabase:^(FMDatabase * _Nonnull db) {
         BOOL result = [db executeUpdate:@"create table if not exists person (id integer primary key autoincrement, name text, age integer);"];
@@ -65,23 +63,17 @@ NSString *RecordListID = @"RecordList";
             music.music_name = [rs stringForColumn:@"标题"];
             music.music_image = [rs stringForColumn:@"缩略图"];
             music.music_bimag = [rs stringForColumn:@"背景图"];
-            music.music_fl = [rs stringForColumn:@"音频"];
+            music.music_fl = [[rs stringForColumn:@"音频"]stringByAppendingString:@".mp3"];
             music.music_id = [rs intForColumn:@"ID"];
             [self.dataArr addObject:music];
         }
     }];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 #pragma mark - Table view data source
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
     return self.dataArr.count;
-    
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -103,8 +95,24 @@ NSString *RecordListID = @"RecordList";
     ZXDRecordViewController *playMusicVC = [[ZXDRecordViewController alloc] init];
     playMusicVC.hidesBottomBarWhenPushed = YES;
     playMusicVC.currentmusic = self.dataArr[indexPath.row];
-//    playMusicVC.dataArr = self.dataArr;
+    playMusicVC.array = self.dataArr;
     [self.navigationController pushViewController:playMusicVC animated:YES];
+    
+}
+
+-(BOOL)createDir:(NSString *)fileName{
+    //获得沙盒的路径
+    //    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString * path = [NSString stringWithFormat:@"%@/%@",documentsDirectory,fileName];
+    NSLog(@"path:%@",path);
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDir;
+    if (![fileManager fileExistsAtPath:path isDirectory:&isDir]) {//先判断目录是否存在，不存在才创建
+        BOOL res=[fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+        return res;
+    } else return NO;
     
 }
 @end

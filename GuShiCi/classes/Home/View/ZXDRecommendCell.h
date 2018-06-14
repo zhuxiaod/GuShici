@@ -18,7 +18,7 @@
 
 typedef void(^tapHandler)(UIButton *sender);
 
-@class ZXDRecommendButton;
+@class ZXDMusic;
 
 @interface ZXDRecommendCell : UITableViewCell
 
@@ -28,7 +28,7 @@ typedef void(^tapHandler)(UIButton *sender);
 
 @property (nonatomic,assign)NSInteger indexTag;
 
-@property (nonatomic,strong)ZXDRecommendButton *recommendButton;
+@property (nonatomic,strong)ZXDMusic *zxdMusic;
 //声明代理
 @property (assign,nonatomic)id<ZXDRecommendCellDelegate>delegate;
 //按钮组

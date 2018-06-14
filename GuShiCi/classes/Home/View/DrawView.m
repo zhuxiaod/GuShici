@@ -100,7 +100,6 @@
     //判断手势的状态
     if(pan.state == UIGestureRecognizerStateBegan){
         //创建路径
-//        UIBezierPath *path = [UIBezierPath bezierPath];
         MyBezierPath *path = [MyBezierPath bezierPath];
         self.path = path;
         //设置起点
@@ -134,7 +133,6 @@
             [path stroke];
         }
     }
-
 }
 
 

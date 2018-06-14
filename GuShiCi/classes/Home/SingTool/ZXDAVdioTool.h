@@ -11,9 +11,14 @@
 
 @interface ZXDAVdioTool : NSObject
 
-@property (nonatomic,strong)AVAudioPlayer *player;
+//@property (nonatomic,strong)AVAudioPlayer *player;
 
-+(AVAudioPlayer *)playingMusicWithMusicFileName:(NSString *)filename;
+@property (strong, nonatomic)AVAudioPlayer *play;
+
+//+(AVAudioPlayer *)playingMusicWithMusicFileName:(NSString *)filename didComplete:(void(^)(void))complete;
++ (instancetype)sharedPlayManager;
+
+- (void)playMusicWithFileName:(NSString *)fileName didComplete:(void(^)(void))complete;
 
 +(void)pauseMusicWithMusicFileName:(NSString *)filename;
 

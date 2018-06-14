@@ -66,7 +66,7 @@
 -(void)timeChange
 {
     //倒计时
-    static int i = 0;
+    static int i = 2;
     
     //如果计时器变为0了？
     if(i == 0)
@@ -77,7 +77,6 @@
     i--;
     
     [_jumpBtn setTitle:[NSString stringWithFormat:@"跳转(%d)",i] forState:UIControlStateNormal];
-    
 }
 
 #pragma mark - 加载广告数据
@@ -126,30 +125,17 @@
 -(void)setupLaunchImageView
 {
     if (iphone6P) {
-        self.launchImageView.image = [UIImage imageNamed:@"LaunchImage-800-Portrait-736h@3x"];
+        self.launchImageView.image = [UIImage imageNamed:@"古诗词"];
     }else if (iphone6){
-        self.launchImageView.image = [UIImage imageNamed:@"LaunchImage-800-667h@2x"];
+        self.launchImageView.image = [UIImage imageNamed:@"古诗词"];
     }else if (iphone5){
-        self.launchImageView.image = [UIImage imageNamed:@"LaunchImage-700-568h@2x"];
+        self.launchImageView.image = [UIImage imageNamed:@"古诗词"];
     }else if (iphone4){
-        self.launchImageView.image = [UIImage imageNamed:@"LaunchImage-700@2x"];
+        self.launchImageView.image = [UIImage imageNamed:@"古诗词"];
     }
 
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

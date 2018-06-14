@@ -20,5 +20,6 @@
 @property (nonatomic, copy) NSString *name;
 
 /** <#digest#> */
-@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong) NSString *url;
++ (instancetype)videoGroupWithDict:(NSDictionary *)dict;
 @end

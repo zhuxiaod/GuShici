@@ -15,36 +15,54 @@
 #import "ZXDSetupView.h"
 #import "ZXDPreViewController.h"
 
-@interface ZXDWriteViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,ZXDColorSelectedViewDelegate,DrawViewDelegate,ZXDSetupViewDelegate>
+@interface ZXDWriteViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,ZXDColorSelectedViewDelegate,DrawViewDelegate,ZXDSetupViewDelegate,NSXMLParserDelegate>
+//xib UI
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UIView *topView;
 @property (weak, nonatomic) IBOutlet UILabel *backGroundlabel;
 @property (weak, nonatomic) IBOutlet DrawView *drawView;
 @property (weak, nonatomic) IBOutlet UIImageView *backView;
 @property (weak, nonatomic) IBOutlet UIButton *textBtn;
-@property (nonatomic, assign)NSInteger selected; //记录选中状态
-@property (nonatomic, strong)NSMutableArray *dataArray;//数组中添加选中时候的tag值
-@property (nonatomic, assign)NSInteger selectedFR; //记录选中状态
 @property (strong, nonatomic)ZXDSetupView *setupView;
 @property (strong, nonatomic)ZXDColorSelectedView *colorView;
-//现在是什么字
-@property (nonatomic,strong)ZXDHanZi *hanZi;
-//写字的数据源
-@property (nonatomic, strong)NSArray *dataArr;
+//cell
+@property (nonatomic, assign)NSInteger selected; //记录选中状态
+@property (nonatomic, assign)NSInteger selectedFR; //记录选中状态
 
+//数据源
+@property (nonatomic, strong)NSMutableArray *dataArray;//数组中添加选中时候的tag值
+@property (nonatomic, strong)NSMutableArray *dataArr;
+@property (nonatomic, strong)NSMutableArray *guShiCi;
+//模型
+@property (nonatomic,strong)ZXDHanZi *hanZi;
+//解析XML
+@property (strong, nonatomic) NSString *currentTagName;
+@property (nonatomic, strong)NSMutableDictionary * currentDictionary;
+@property (nonatomic, copy)NSString * currentDictionaryKey;
 @end
+//cellID
 static NSString *collectionViewID = @"CollectionCell";
 
 @implementation ZXDWriteViewController
 
-- (NSArray *)dataArr
+//xml写字数据源
+- (NSMutableArray *)guShiCi
+{
+    if(!_guShiCi){
+        //说明模型和plist有问题
+        _guShiCi = [NSMutableArray array];
+    }
+    return _guShiCi;
+}
+
+- (NSMutableArray *)dataArr
 {
     if(!_dataArr){
-        [self createData];
+        _dataArr = [NSMutableArray array];
     }
     return _dataArr;
 }
-
+#pragma mark - 写字板功能
 //清屏
 - (IBAction)clear:(UIButton *)sender {
      [self.drawView clear];
@@ -75,6 +93,7 @@ static NSString *collectionViewID = @"CollectionCell";
     //添加确定到UIAlertController中
     UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         for (ZXDHanZi *zi in self.dataArr) {
+            //清楚每个字模型中的数据
             zi.allPath = nil;
         }
         self.hanZi.allPath = nil;
@@ -101,24 +120,44 @@ static NSString *collectionViewID = @"CollectionCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    DrawView *drawView = [[DrawView alloc] init];
-    _drawView = drawView;
-    
     //初始化属性
     [self initProperty];
-    _hanZi = [[ZXDHanZi alloc] init];
+    //解析xml
+    [self getXML];
     //设置backView图片
     [self setupBackViewImage:[UIImage imageNamed:@"45BC001AD7DD6628767E43D65DACB47C"]];
     //设置button样式
     [self setupButtonStyle:self.textBtn];
-    
     //设置CollectionView
     [self setupCollectionView];
-    
     //添加预览按钮
     [self setupNavBar];
 }
-
+#pragma mark - 解析XML
+-(void)getXML{
+    //创建一个异步请求
+    //得到全局队列
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        //解析数据
+        // 将数据写入 file
+        // 获取文件路径
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"phrase_tangshi" ofType:@"xml"];
+        
+        // 根据文件路径读取数据
+        NSData *jdata = [[NSData alloc] initWithContentsOfFile:filePath];
+        //4.1 创建XML解析器:SAX
+        NSXMLParser *parser = [[NSXMLParser alloc]initWithData:jdata];
+        //4.2 设置代理
+        parser.delegate = self;
+        //4.3 开始解析,阻塞
+        [parser parse];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //更新tableView
+            [self createData];
+        });
+    });
+}
 #pragma mark - 设置导航条
 -(void)setupNavBar
 {
@@ -126,7 +165,6 @@ static NSString *collectionViewID = @"CollectionCell";
     //左边导航条
     //把UIButton包装成UIButtonItem,导致点击区域变大
     self.navigationItem.rightBarButtonItem = [UIBarButtonItem itemWithTitle:@"预览" target:self action:@selector(preview)];
-    
     //中间导航条
     self.navigationItem.title = @"写一写";
 }
@@ -135,11 +173,7 @@ static NSString *collectionViewID = @"CollectionCell";
 //将数组中的内容一个一个的取出来。然后内容重新绘制成图片
 #pragma mark 预览页跳转
 -(void)preview{
-    //获取每一个cell
-    //最后一个cell
-//    ZXDHanZi *hanzi1 = [self.dataArr objectAtIndex:19];
-//    NSLog(@"%lu",_dataArray.count - 1);
-//    hanzi1.allPath = _hanZi.allPath;
+    //获取每一个cell,将路线绘制并加入字模型中
     for (int i = 0;i < self.dataArr.count;i++) {
         ZXDHanZi *hanzi = [self.dataArr objectAtIndex:i];
         self.drawView.ZXDNewAllPath = hanzi.allPath;
@@ -156,6 +190,10 @@ static NSString *collectionViewID = @"CollectionCell";
         //将图片加入到数组之中
         hanzi.image = newImage;
     }
+    //遍历后,画板和当前字相同
+    ZXDHanZi *hanzi = [self.dataArr objectAtIndex:_selected];
+    self.drawView.ZXDNewAllPath = hanzi.allPath;
+    //跳转预览页
     ZXDPreViewController *preViewVC = [[ZXDPreViewController alloc] init];
     preViewVC.hidesBottomBarWhenPushed = YES;
     preViewVC.dataArray = self.dataArr;
@@ -163,9 +201,10 @@ static NSString *collectionViewID = @"CollectionCell";
 }
 //初始化属性
 -(void)initProperty{
-    self.selected = -1;
+    self.selected = 0;
     self.selectedFR = 0;
     self.drawView.delegate = self;
+    _hanZi = [[ZXDHanZi alloc] init];
 }
 
 //设置写字的背景图片
@@ -173,18 +212,6 @@ static NSString *collectionViewID = @"CollectionCell";
 {
     UIImage *backViewImage = image;
     self.backView.image = backViewImage;
-}
-//初始化数据源
--(void)createData
-{
-    NSString *str = @"春眠不觉晓处处闻啼鸟夜来风雨声花落知多少";
-    NSMutableArray *array = [NSMutableArray array];
-    for (int i = 0; i < str.length; i++) {
-        ZXDHanZi *hanZi = [[ZXDHanZi alloc] init];
-        hanZi.ZXDhanZi = [str substringWithRange:NSMakeRange(i, 1)];
-        [array  addObject:hanZi];
-        self.dataArr = array;
-    }
 }
 //设置CollectionView
 -(void)setupCollectionView
@@ -204,6 +231,48 @@ static NSString *collectionViewID = @"CollectionCell";
     button.layer.borderColor = [UIColor whiteColor].CGColor;
     button.layer.borderWidth = 2;
 }
+#pragma mark - 数据源
+-(void)createData
+{
+    //有数据说明是从其他页面跳转过来,不是从首页之中
+    if(!_musicTitle){
+        //将字符串转化成字模型
+        NSString *str = @"春眠不觉晓处处闻啼鸟夜来风雨声花落知多少";
+        [self editString:str];
+        
+    }else{
+            //查找标题相同的xml数据源
+            for (int i = 0; i < self.guShiCi.count; i++) {
+                NSDictionary *dic = self.guShiCi[i];
+                NSString *str = [dic objectForKey:@"title"];
+                NSString *str2 = [str substringWithRange:NSMakeRange(1,_musicTitle.length)];
+                //对比标题
+                if([str2 isEqualToString:self.musicTitle]){
+                    //对xml数据进行排版
+                    NSString *str = [dic objectForKey:@"content"];
+                  
+                    [self editString:str];
+                }
+            }
+        }
+}
+
+-(void)editString:(NSString *)str
+{
+    //去掉空格
+    str = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSMutableArray *array = [NSMutableArray array];
+    for (int i = 0; i < str.length; i++) {
+        //这里 创建一个对象把字装着
+        NSString *str1 = [str substringWithRange:NSMakeRange(i, 1)];
+        ZXDHanZi *hanZi = [[ZXDHanZi alloc] init];
+        hanZi.ZXDhanZi = str1;
+        [array  addObject:hanZi];
+        self.dataArr = array;
+    }
+    [self reloadView];
+}
+
 #pragma mark - collectionViewDelegate
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
@@ -216,8 +285,8 @@ static NSString *collectionViewID = @"CollectionCell";
     ZXDHanZi *Hanzi = self.dataArr[indexPath.row];
     cell.lable.text = Hanzi.ZXDhanZi;
     cell.selected = NO;
-    //点击样式
-    if(indexPath.row == self.selected && self.selected != -1){
+    //点击样式&& self.selected != -1
+    if(indexPath.row == self.selected){
         cell.selected = YES;
     }
     //默认第一行样式 初始化
@@ -234,11 +303,12 @@ static NSString *collectionViewID = @"CollectionCell";
 {
     //点击cell效果
     self.selected = indexPath.row;
+    //获取点到的字模型
     ZXDHanZi *hanZi = self.dataArr[indexPath.row];
+    //转为当前字
     _hanZi = hanZi;
     //显示当前字的线条
-    self.drawView.ZXDNewAllPath = _hanZi.allPath;
-    
+    self.drawView.ZXDNewAllPath = hanZi.allPath;
     //显示背景
     _backGroundlabel.text = hanZi.ZXDhanZi;
     if(self.selected != 0){
@@ -246,7 +316,7 @@ static NSString *collectionViewID = @"CollectionCell";
         cell.selected = NO;
     }
 }
-//bug : 最后一个cell并没有被点击 因此没有他的draw 没有被加入
+//bug :循环20次。导致选中文字和view上的字。不一样
 #pragma mark - 跳转输入文字窗口
 - (IBAction)putInText:(UIButton *)sender {
     ZXDPutInTextViewController *PITVC = [[ZXDPutInTextViewController alloc] init];
@@ -255,17 +325,7 @@ static NSString *collectionViewID = @"CollectionCell";
         //把故事取出来了
         NSString *str = [dic objectForKey:@"content"];
         //去掉空格
-        str = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
-        NSMutableArray *array = [NSMutableArray array];
-        for (int i = 0; i < str.length; i++) {
-            //这里 创建一个对象把字装着
-            NSString *str1 = [str substringWithRange:NSMakeRange(i, 1)];
-            ZXDHanZi *hanZi = [[ZXDHanZi alloc] init];
-            hanZi.ZXDhanZi = str1;
-            [array  addObject:hanZi];
-            self.dataArr = array;
-            [self reloadView];
-        }
+        [self editString:str];
     };
     [self.navigationController pushViewController:PITVC animated:YES];
 }
@@ -274,36 +334,93 @@ static NSString *collectionViewID = @"CollectionCell";
 {
     //把写的字加入当前cell
     _hanZi.allPath = allpath;
-    NSLog(@"%@",allpath);
 }
 //刷新页面
 -(void)reloadView{
     ZXDHanZi *hanzi = self.dataArr[0];
     self.backGroundlabel.text = hanzi.ZXDhanZi;
-    self.selected = -1;
+    self.drawView.ZXDNewAllPath = hanzi.allPath;
+    self.selected = 0;
     self.selectedFR = 0;
     [self.collectionView reloadData];
 }
 #pragma mark - colorViewDelegate
+//设置颜色
 -(void)ZXDColorSelectedView:(ZXDColorSelectedView *)ZXDColorSelectedView selectColor:(UIColor *)selectColor
 {
     [self.drawView setLineColor:selectColor];
 }
 #pragma mark - setupViewDelegate
+//设置线
 -(void)ZXDSetupView1:(ZXDSetupView *)ZXDSetupView slider1:(UISlider *)slider
 {
     [self.drawView setLineWidth:slider.value];
 }
-
+//label大小
 -(void)ZXDSetupView2:(ZXDSetupView *)ZXDSetupView slider2:(UISlider *)slider2
 {
     _backGroundlabel.font = [UIFont boldSystemFontOfSize:slider2.value];
 }
+//关闭View
 -(void)ZXDSetupView:(ZXDSetupView *)ZXDSetupView btn:(UIButton *)btn
 {
     [self.setupView removeFromSuperview];
 }
-//差一个页面弹出动画                            ok
-//预览按钮
-//设置字体页面 --> 控制笔的大小 控制背景label的大小 ok
+#pragma mark NSXMLParserDelegate
+- (void)parserDidStartDocument:(NSXMLParser *)parser
+{
+    //初始化存放xml数据字典的数组
+    self.guShiCi = [NSMutableArray arrayWithCapacity:0];
+}
+//2.开始解析某个元素
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName
+  namespaceURI:(nullable NSString *)namespaceURI
+ qualifiedName:(nullable NSString *)qName attributes:(NSDictionary<NSString *, NSString *> *)attributeDict
+{
+    //表示开始遍历子结点了
+    if ([elementName isEqualToString:@"phrase"])//对Person标签进行比对
+    {
+        //新建一个索引为elementName的key字典
+        NSMutableDictionary * elementNameDictionary = [NSMutableDictionary dictionary];
+        
+        //将数据添加到当前数组
+        [self.guShiCi addObject:elementNameDictionary];
+        
+        //记录当前进行操作的结点字典
+        self.currentDictionary = elementNameDictionary;
+    }
+    //表示不是Persons的子节点,因为是else if,也保证
+    else if (![elementName isEqualToString:@"phrase"])//排除Person以及Persons标签
+    {
+        //记录当前的结点值
+        self.currentDictionaryKey = elementName;
+        
+        //设置当前element的值,先附初始值
+        [self.currentDictionary addEntriesFromDictionary:@{elementName:@""}];
+    }
+}
+-(void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
+{
+    //如果结点内容的第一个字符是‘\n’,表示是包含其他结点的结点
+    if (string.length > 0 && [string characterAtIndex:0] != '\n')
+    {
+        //对当前字典进行初始化赋值
+        [self.currentDictionary setValue:string forKey:self.currentDictionaryKey];
+    }
+}
+-(void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
+{
+    //只有结束Person的时候清除相关数据
+    if ([elementName isEqualToString:@"phrase"])
+    {
+        //cleat data
+        self.currentDictionary = nil;
+        self.currentDictionaryKey = nil;
+    }
+}
+//4.结束解析
+-(void)parserDidEndDocument:(NSXMLParser *)parser
+{
+    //    [self.tableView reloadData];
+}
 @end

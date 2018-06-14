@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface ZXDWriteViewController : UIViewController
-
+//跳转过来的古诗的标题
+@property(nonatomic,copy)NSString *musicTitle;
 @end

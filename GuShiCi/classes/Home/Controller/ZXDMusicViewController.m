@@ -23,6 +23,8 @@
 @property (strong, nonatomic) NSArray *music;
 /** 请求管理者 */
 @property (nonatomic, weak) AFHTTPSessionManager *manager;
+@property (nonatomic, strong) FMDatabaseQueue *queue;
+
 @end
 
 NSString *ID = @"musicID";
@@ -35,8 +37,9 @@ NSString *ID = @"musicID";
 - (NSMutableArray *)dataArr
 {
     if(!_dataArr){
+        _dataArr = [NSMutableArray array];
         //说明模型和plist有问题
-        [self loadCells];
+//        [self loadCells];
     }
     return _dataArr;
 }
@@ -51,28 +54,63 @@ NSString *ID = @"musicID";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor redColor];
+    self.view.backgroundColor = [UIColor whiteColor];
 
     //1.注册cell
     [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([ZXDMusicTableViewCell class]) bundle:nil] forCellReuseIdentifier:ID];
+    //设置button数据源
+    [self setupDB];
 }
 
--(void)loadCells
-{
-    NSDictionary *paramDict = @{@"album_id":@"3"
-                                };
-    [self.manager GET:@"http://g1q.gn.zaijiawan.com/matrix_common/api/audio/childStoryList" parameters:paramDict progress:nil
-         success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-             ZXDWeakSelf;
-             weakSelf.dataArr  = [ZXDMusic mj_objectArrayWithKeyValuesArray:responseObject[@"data"][@"music"]];
-             // 刷新表格
-             [weakSelf.tableView reloadData];
-
-         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-             NSLog(@"failure:%@",error);
-         }];
-
+-(void)setupDB{
+    //本地文件的路径
+    NSString *string = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"db"];
+    
+    //1.创建数据库队列
+    self.queue = [FMDatabaseQueue databaseQueueWithPath:string];
+    //2.创建表
+    [self.queue inDatabase:^(FMDatabase * _Nonnull db) {
+        BOOL result = [db executeUpdate:@"create table if not exists person (id integer primary key autoincrement, name text, age integer);"];
+        if(result){
+            NSLog(@"创建成功");
+        }else{
+            NSLog(@"创建失败");
+        }
+    }];
+    [self query];
 }
+-(void)query{
+    [self.queue inDatabase:^(FMDatabase * _Nonnull db) {
+        //1.查询数据
+        FMResultSet *rs = [db executeQuery:@"select * from Content"];
+        //2.遍历结果集
+        while(rs.next){
+            ZXDMusic *music = [[ZXDMusic alloc] init];
+            music.music_name = [rs stringForColumn:@"标题"];
+            music.music_image = [rs stringForColumn:@"缩略图"];
+            music.music_bimag = [rs stringForColumn:@"背景图"];
+            music.music_fl = [[rs stringForColumn:@"音频"]stringByAppendingString:@".mp3"];
+            music.music_id = [rs intForColumn:@"ID"];
+            [self.dataArr addObject:music];
+        }
+    }];
+}
+//-(void)loadCells
+//{
+//    NSDictionary *paramDict = @{@"album_id":@"3"
+//                                };
+//    [self.manager GET:@"http://g1q.gn.zaijiawan.com/matrix_common/api/audio/childStoryList" parameters:paramDict progress:nil
+//         success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+//             ZXDWeakSelf;
+//             weakSelf.dataArr  = [ZXDMusic mj_objectArrayWithKeyValuesArray:responseObject[@"data"][@"music"]];
+//             // 刷新表格
+//             [weakSelf.tableView reloadData];
+//
+//         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+//             NSLog(@"failure:%@",error);
+//         }];
+//
+//}
 
 #pragma mark - UITableView
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -86,13 +124,6 @@ NSString *ID = @"musicID";
     // 2.访问缓存池
     ZXDMusicTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:ID];
     cell.Music = self.dataArr[indexPath.row];
-    ZXDMusic *music = self.dataArr[indexPath.row];
-    NSInteger storyID = music.story_id - 300;
-    NSString *stID = [[NSString alloc] initWithFormat:@"%ld",(long)storyID];
-    //中文转拼音
-    NSString *storyName = [ZXDMusic chChangePin:music.story_name];
-    NSString *filename = [[NSString alloc] initWithFormat:@"%@-%@.mp3",stID,storyName];
-    music.filename = filename;
     return cell;
 }
 
@@ -109,6 +140,12 @@ NSString *ID = @"musicID";
     playMusicVC.currentmusic = self.dataArr[indexPath.row];
     playMusicVC.dataArr = self.dataArr;
     [self.navigationController pushViewController:playMusicVC animated:YES];
+    
+}
+#pragma mark - 隐藏navigationBar
+-(void) viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
     
 }
 @end

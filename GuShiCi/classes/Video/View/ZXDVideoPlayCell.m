@@ -21,11 +21,15 @@
 -(void)setVideo:(ZXDVideoModel *)video
 {
     _video = video;
-    NSString *str = @"http://120.25.226.186:32812/";
+    //视频地址
+    //视频的图片
+    //名字
+//    http://bsyvideo.boosj.com/v/2016-06/03/2016-0603CVNC123013461111718243.mp4?start=0&t=jRBZq6YWmizIYzanhVKw-w&m=1526718257&c=m
+//    NSString *str = @"http://120.25.226.186:32812/";
     NSString *str2 = [video.image absoluteString];
-    NSString *Str3 = [str stringByAppendingString:str2];
+//    NSString *Str3 = [str stringByAppendingString:str2];
     self.name.text = video.name;
-    [self.image sd_setImageWithURL:[NSURL URLWithString:Str3]];
+    [self.image sd_setImageWithURL:[NSURL URLWithString:str2]];
 }
 
 - (IBAction)addBtnClick:(UIButton *)sender {

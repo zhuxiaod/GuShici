@@ -21,28 +21,38 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XvB-fM-8HT">
-                        <rect key="frame" x="117" y="39" width="144" height="21"/>
+                        <rect key="frame" x="110" y="10" width="200" height="20"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="21" id="g92-oO-L4f"/>
+                            <constraint firstAttribute="height" constant="20" id="g92-oO-L4f"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CxD-Ql-vL7">
-                        <rect key="frame" x="16" y="11" width="75" height="75"/>
+                        <rect key="frame" x="10" y="11" width="80" height="70"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="75" id="P7v-qm-0e6"/>
+                            <constraint firstAttribute="width" constant="80" id="P7v-qm-0e6"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="7"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                            <userDefinedRuntimeAttribute type="string" keyPath="layer.borderWidth" value="1"/>
+                            <userDefinedRuntimeAttribute type="color" keyPath="layer.borderUIColor">
+                                <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </imageView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="CxD-Ql-vL7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="1Lq-eJ-LAE"/>
-                    <constraint firstItem="XvB-fM-8HT" firstAttribute="leading" secondItem="CxD-Ql-vL7" secondAttribute="trailing" constant="26" id="5aA-7c-wa1"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="XvB-fM-8HT" secondAttribute="trailing" constant="43" id="FXl-T3-bkc"/>
+                    <constraint firstItem="CxD-Ql-vL7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="-6" id="1Lq-eJ-LAE"/>
+                    <constraint firstItem="XvB-fM-8HT" firstAttribute="leading" secondItem="CxD-Ql-vL7" secondAttribute="trailing" constant="20" id="5aA-7c-wa1"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="XvB-fM-8HT" secondAttribute="trailing" constant="-6" id="FXl-T3-bkc"/>
                     <constraint firstItem="CxD-Ql-vL7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="NGg-zS-OxK"/>
-                    <constraint firstItem="XvB-fM-8HT" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="28" id="fPP-s1-6dS"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="CxD-Ql-vL7" secondAttribute="bottom" constant="3" id="taH-E1-Fny"/>
+                    <constraint firstItem="XvB-fM-8HT" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="-1" id="fPP-s1-6dS"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="CxD-Ql-vL7" secondAttribute="bottom" constant="8" id="taH-E1-Fny"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
@@ -50,7 +60,7 @@
                 <outlet property="music_image" destination="CxD-Ql-vL7" id="PEc-9z-GfC"/>
                 <outlet property="music_name" destination="XvB-fM-8HT" id="5am-kl-Mw9"/>
             </connections>
-            <point key="canvasLocation" x="-246" y="109"/>
+            <point key="canvasLocation" x="5" y="105"/>
         </tableViewCell>
     </objects>
 </document>

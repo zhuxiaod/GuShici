@@ -13,4 +13,5 @@ pod 'FDFullscreenPopGesture'
 pod 'MJRefresh'
 pod 'Masonry'
 pod 'FMDB'
+pod 'PYSearch'
 end

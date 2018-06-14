@@ -27,6 +27,9 @@
 #import "ZXCustomWindow.h"
 #import "CABasicAnimation+Poziton.h"
 #import "UIBarButtonItem+Item.h"
+#import "ZXDNavigationViewController.h"
+#import "PYSearch.h"
+#import "UIImage+Tint.h"
 
 //是否是空对象
 #define LMJIsEmpty(_object) (_object == nil \

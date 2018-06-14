@@ -8,48 +8,48 @@
 
 #import "ZXDAVdioTool.h"
 #import <AVFoundation/AVFoundation.h>
-@interface ZXDAVdioTool ()
+@interface ZXDAVdioTool ()<AVAudioPlayerDelegate>
+
+@property(copy,nonatomic) NSString *fileName;
+
+@property (nonatomic, copy) void(^complete)(void);
+
 @end
 
 @implementation ZXDAVdioTool
 
 static NSMutableDictionary *_players;
-
-//初始化播放器
-+(void)initialize
-{
-    _players = [NSMutableDictionary dictionary];
++ (instancetype)sharedPlayManager{
+    
+    static ZXDAVdioTool *_playManager;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        _playManager = [[self alloc]init];
+    });
+    return _playManager;
 }
 
-//根据参数文件名找到文件路径并根据文件路径创建播放器player
-+(AVAudioPlayer *)playingMusicWithMusicFileName:(NSString *)filename
+- (void)playMusicWithFileName:(NSString *)fileName didComplete:(void(^)(void))complete
 {
-    AVAudioPlayer *player = nil;
-//    self.avplayers = player;
-    //players为nil
-    player = _players[filename];
-    if (player == nil) {
-        // 文件路径转化为url
-        NSString *pathDocuments = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)objectAtIndex:0];
-        NSString *createPath = [NSString stringWithFormat:@"%@/musicFile/%@",pathDocuments,filename];
-        NSLog(@"createPath:%@",createPath);
-        NSURL *url = [NSURL URLWithString:createPath];
-        if (url == nil) {
-            NSLog(@"url为空");
-            return nil;
-        }
-        NSError *error;
-        // 创建player
-        player = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&error];
-        NSLog(@"error:%@",error);
-        // 准备播放
-        [player prepareToPlay];
-        // 将播放器存储到字典中
-        [_players setObject:player forKey:filename];
+    if (![_fileName isEqualToString:fileName]) {
+        // 1.加载资源文件
+        NSURL *url = [[NSBundle mainBundle] URLForResource:fileName withExtension:nil];
+        // 2.创建播放器
+        _play = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:NULL];
+        // 3.准备播放
+        [_play prepareToPlay];
+        
+        _play.delegate = self;
+        // 赋值
+        _fileName = fileName;
+        
+        _complete = complete;
     }
-    // 开始播放
-    [player play];
-    return player;
+    
+    // 4.播放
+    [_play play];
 }
 
 +(void)pauseMusicWithMusicFileName:(NSString *)filename
@@ -68,6 +68,13 @@ static NSMutableDictionary *_players;
         [_players removeObjectForKey:filename];
         player = nil;
     }
+}
+#pragma mark 代理方法
+/// 当歌曲播放完毕时调用
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+{
+    //  在这里回调block
+    self.complete();
 }
 @end
 

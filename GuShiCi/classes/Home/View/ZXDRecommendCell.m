@@ -9,9 +9,11 @@
 #import "ZXDRecommendCell.h"
 #import "HomeButton.h"
 #import "ZXDRecommendButton.h"
+#import "ZXDMusic.h"
+#import "ZXDRecommendView.h"
 
 @interface ZXDRecommendCell ()
-
+@property(nonatomic,strong)ZXDRecommendView *recommendView;
 
 
 @end
@@ -33,18 +35,22 @@
     // Configure the view for the selected state
 }
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    // Initialization code
-}
-//
 -(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        //推荐歌单
+        _recommendView = [[[NSBundle mainBundle]loadNibNamed:@"ZXDRecommendView" owner:self options:nil]lastObject];
+        [self addSubview:_recommendView];
         //创建6个button
         for (NSInteger i = 0; i < 6; i ++) {
             
             HomeButton * button1 = [HomeButton buttonWithType:UIButtonTypeCustom];
+            //设置button的样式
+            button1.imageView.layer.cornerRadius = 10;
+            button1.imageView.layer.masksToBounds = YES;
+            button1.imageView.layer.borderWidth = 1;
+            button1.imageView.layer.borderColor = [UIColor redColor].CGColor;
+            button1.titleLabel.font = [UIFont systemFontOfSize:13];
             NSInteger index = i;
             button1.tag = index;
             [button1 setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -64,6 +70,7 @@
     //下面是九宫格的设计
     //给button定位置
     //给每个button设置位置
+    _recommendView.frame = CGRectMake(20, 10, 100, 30);
     for (NSInteger i = 0; i < 6; i ++) {
         HomeButton *button = [self.btns objectAtIndex:i];
         NSInteger l = i % 3;
@@ -71,9 +78,9 @@
         
         NSInteger space = 20;
         // 300 - 2 * 20 =260 /3 = 90
-        CGFloat width = (self.frame.size.width - 2 * space) / 3;
-        CGFloat height = 150;
-        button.frame = CGRectMake((space + width) * l,20 + (space + height) * h, width, height);
+        CGFloat width = (self.frame.size.width - 4 * space) / 3;
+        CGFloat height = 120;
+        button.frame = CGRectMake(20+(space + width) * l,50 + (space + height) * h, width, height);
     }
 }
 
@@ -84,20 +91,13 @@
 
 
 //传递数据
--(void)setRecommendButton:(ZXDRecommendButton *)recommendButton
+-(void)setZxdMusic:(ZXDMusic *)zxdMusic
 {
     //为什么会显示最后一个？
-    _recommendButton = recommendButton;
-
+    _zxdMusic = zxdMusic;
         HomeButton *button = [self.btns objectAtIndex:_indexTag];
-//         NSLog(@"内存地址1：%p", button);
-        NSLog(@"%p------%@",button,recommendButton.btnTittle);
-        //地址不同。说明数据有问题
-        //数据也不同 这是为什么？
-        //数据被覆盖了
-//        if (recommendButton.btnImage == nil && recommendButton.btnTittle == nil) {
-            [button setImage:[UIImage imageNamed:recommendButton.btnImage] forState:UIControlStateNormal];
-            [button setTitle:recommendButton.btnTittle forState:UIControlStateNormal];
+        [button setImage:[UIImage imageNamed:zxdMusic.music_image] forState:UIControlStateNormal];
+        [button setTitle:zxdMusic.music_name forState:UIControlStateNormal];
 }
 
 #pragma mark - handleButton

@@ -18,7 +18,6 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    // Initialization code
 }
 -(void)setTangShi:(NSDictionary *)tangShi
 {

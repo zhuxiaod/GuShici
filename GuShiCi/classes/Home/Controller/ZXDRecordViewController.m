@@ -5,9 +5,10 @@
 //  Created by zxd on 2018/4/25.
 //  Copyright © 2018年 zxd. All rights reserved.
 //
-
+#import "ZXDPlayMusicViewController.h"
 #import "ZXDRecordViewController.h"
 #import "ZXDMusic.h"
+#import "ZXDWriteViewController.h"
 
 # define COUNTDOWN 60
 
@@ -30,6 +31,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *BGimage;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (weak, nonatomic) IBOutlet UILabel *musicNameLabel;
+@property (nonatomic,strong) NSMutableArray *dataArray;
 
 
 @end
@@ -44,8 +46,16 @@
     return _MusicData;
 }
 
+-(NSMutableArray *)dataArray{
+    
+    if(!_dataArray){
+        _dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.dataArray = _array;
     _BGimage.image = [UIImage imageNamed:_currentmusic.music_bimag];
     [self createTextView];
 }
@@ -64,27 +74,10 @@
     [_musicNameLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:20]];
 }
 
-
--(void)query{
-    [self.queue inDatabase:^(FMDatabase * _Nonnull db) {
-        //1.查询数据
-        FMResultSet *rs = [db executeQuery:@"select * from Content"];
-        //2.遍历结果集
-        while(rs.next){
-            ZXDMusic *music = [[ZXDMusic alloc] init];
-            music.music_name = [rs stringForColumn:@"标题"];
-            music.music_image = [rs stringForColumn:@"缩略图"];
-            music.music_bimag = [rs stringForColumn:@"背景图"];
-            music.music_fl = [rs stringForColumn:@"音频"];
-            music.music_id = [rs intForColumn:@"ID"];
-            [self.MusicData addObject:music];
-        }
-    }];
-}
 - (IBAction)startRecord:(UIButton *)sender {
     NSLog(@"开始录音");
     
-    countDown = 60;
+    countDown = 0;
     [self addTimer];
     
     AVAudioSession *session = [AVAudioSession sharedInstance];
@@ -104,8 +97,6 @@
     //1.获取沙盒地址
     NSString *path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     filePath = [path stringByAppendingString:@"/Record.wav"];
-    
-    NSLog(@"filePath:%@",filePath);
     
     //2.获取文件路径
     self.recordFileUrl = [NSURL fileURLWithPath:filePath];
@@ -152,11 +143,11 @@
     NSFileManager *manager = [NSFileManager defaultManager];
     if([manager fileExistsAtPath:filePath]){
         
-        _timeLabel.text = [NSString stringWithFormat:@"录了 %ld 秒,文件大小为 %.2fkb",COUNTDOWN - countDown,[[manager attributesOfItemAtPath:filePath error:nil] fileSize]/1024.0];
+        _timeLabel.text = [NSString stringWithFormat:@"已录制 %ld 秒",countDown];
+        //文件大小
+//        [[manager attributesOfItemAtPath:filePath error:nil] fileSize]/1024.0
     }else{
-        
         _timeLabel.text = @"最多录60秒";
-    
     }
 }
 
@@ -174,6 +165,7 @@
     
     [self.session setCategory:AVAudioSessionCategoryPlayback error:nil];
     [self.player play];
+     _timeLabel.text = @"正在播放";
 }
 
 
@@ -190,15 +182,19 @@
 }
 
 -(void)refreshLabelText{
-    countDown --;
-    _timeLabel.text = [NSString stringWithFormat:@"还剩下 %ld 秒",countDown];
+    countDown ++;
+    _timeLabel.text = [NSString stringWithFormat:@"已录制 %ld 秒",countDown];
 }
-
-
-
-
-
-
-
-
+- (IBAction)pushWriteView:(UIButton *)sender {
+    ZXDWriteViewController *writeVC = [[ZXDWriteViewController alloc] init];
+    writeVC.musicTitle = _currentmusic.music_name;
+    [self.navigationController pushViewController:writeVC animated:YES];
+    
+}
+- (IBAction)pushMusicView:(UIButton *)sender {
+    ZXDPlayMusicViewController *musicVC = [[ZXDPlayMusicViewController alloc] init];
+    musicVC.currentmusic = _currentmusic;
+    musicVC.dataArr = self.dataArray;
+    [self.navigationController pushViewController:musicVC animated:YES];
+}
 @end

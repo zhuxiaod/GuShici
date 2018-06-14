@@ -25,6 +25,7 @@
     
     //设置导航条背景图片
     [nac setBackgroundImage:[UIImage imageNamed:@"navigationbarBackgroundWhite"] forBarMetrics:UIBarMetricsDefault];
+//    [nac setBackgroundColor:[UIColor redColor]];
 }
 
 - (void)viewDidLoad {

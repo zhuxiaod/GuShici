@@ -50,11 +50,9 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eP0-pe-Tg8">
                     <rect key="frame" x="0.0" y="592" width="375" height="75"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gKw-sB-Dvc" userLabel="play">
-                            <rect key="frame" x="255" y="25" width="37" height="50"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="50" id="Yvt-V3-hOS"/>
-                            </constraints>
+                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gKw-sB-Dvc" userLabel="play">
+                            <rect key="frame" x="255" y="25" width="50" height="50"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <state key="normal" title="播放"/>
                             <connections>
@@ -70,45 +68,47 @@
                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qMM-4U-vyu">
-                            <rect key="frame" x="83" y="25" width="37" height="50"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="50" id="FjZ-7C-BKB"/>
-                            </constraints>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qMM-4U-vyu">
+                            <rect key="frame" x="83" y="25" width="50" height="50"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <state key="normal" title="停止"/>
                             <connections>
                                 <action selector="stopRecord:" destination="-1" eventType="touchUpInside" id="eGs-KT-FsY"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xWX-jj-jAa">
+                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xWX-jj-jAa">
                             <rect key="frame" x="162" y="25" width="50" height="50"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="50" id="F27-Cq-48P"/>
-                            </constraints>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <state key="normal" title="开始"/>
                             <connections>
                                 <action selector="startRecord:" destination="-1" eventType="touchUpInside" id="J96-I9-Uz4"/>
                             </connections>
                         </button>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yWF-x4-Qnk">
+                            <rect key="frame" x="327" y="35" width="30" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" image="写字-4"/>
+                            <connections>
+                                <action selector="pushWriteView:" destination="-1" eventType="touchUpInside" id="Bem-9t-3ZZ"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xs9-yD-PCl">
+                            <rect key="frame" x="21" y="35" width="30" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" image="音乐-1"/>
+                            <connections>
+                                <action selector="pushMusicView:" destination="-1" eventType="touchUpInside" id="jbG-7b-vxF"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" red="0.045923737046632107" green="0.045923737046632107" blue="0.045923737046632107" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstItem="qMM-4U-vyu" firstAttribute="top" secondItem="vuk-Bd-MMJ" secondAttribute="bottom" constant="3" id="0Ta-5t-Bn8"/>
-                        <constraint firstItem="qMM-4U-vyu" firstAttribute="leading" secondItem="eP0-pe-Tg8" secondAttribute="leading" constant="83" id="2BZ-Bj-LIB"/>
-                        <constraint firstAttribute="bottom" secondItem="qMM-4U-vyu" secondAttribute="bottom" id="DKS-el-8Fu"/>
                         <constraint firstItem="vuk-Bd-MMJ" firstAttribute="top" secondItem="eP0-pe-Tg8" secondAttribute="top" constant="1" id="J94-6D-AEw"/>
-                        <constraint firstItem="gKw-sB-Dvc" firstAttribute="leading" secondItem="xWX-jj-jAa" secondAttribute="trailing" constant="43" id="MYI-vB-NGx"/>
-                        <constraint firstAttribute="trailing" secondItem="gKw-sB-Dvc" secondAttribute="trailing" constant="83" id="ecL-IG-Qsb"/>
-                        <constraint firstItem="gKw-sB-Dvc" firstAttribute="top" secondItem="vuk-Bd-MMJ" secondAttribute="bottom" constant="3" id="gO3-T1-fgu"/>
-                        <constraint firstItem="xWX-jj-jAa" firstAttribute="top" secondItem="vuk-Bd-MMJ" secondAttribute="bottom" constant="3" id="hRW-Wk-zgy"/>
-                        <constraint firstAttribute="bottom" secondItem="xWX-jj-jAa" secondAttribute="bottom" id="jGj-Tz-eVc"/>
-                        <constraint firstAttribute="bottom" secondItem="gKw-sB-Dvc" secondAttribute="bottom" id="oMA-b6-EPi"/>
                         <constraint firstItem="vuk-Bd-MMJ" firstAttribute="leading" secondItem="eP0-pe-Tg8" secondAttribute="leading" constant="83" id="p10-w6-ygV"/>
                         <constraint firstAttribute="trailing" secondItem="vuk-Bd-MMJ" secondAttribute="trailing" constant="83" id="p8l-7A-138"/>
                         <constraint firstAttribute="height" constant="75" id="r92-Zf-1oP"/>
-                        <constraint firstItem="xWX-jj-jAa" firstAttribute="leading" secondItem="qMM-4U-vyu" secondAttribute="trailing" constant="42" id="tXB-LY-vOV"/>
                     </constraints>
                 </view>
             </subviews>
@@ -133,4 +133,8 @@
             <point key="canvasLocation" x="-412.5" y="107.5"/>
         </view>
     </objects>
+    <resources>
+        <image name="写字-4" width="60" height="60"/>
+        <image name="音乐-1" width="60" height="60"/>
+    </resources>
 </document>

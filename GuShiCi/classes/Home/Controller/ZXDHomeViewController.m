@@ -5,7 +5,9 @@
 //  Created by zxd on 2018/3/25.
 //  Copyright © 2018年 zxd. All rights reserved.
 //
-
+#import "ZXDMusic.h"
+#import "ZXDGuShiShowViewController.h"
+#import "ZXDRecommendView.h"
 #import "ZXDHomeViewController.h"
 #import "UIBarButtonItem+Item.h"
 #import "ZXDSettingViewController.h"
@@ -22,36 +24,49 @@
 #import "ZXDRecordViewController.h"
 #import "ZXDRecordListViewController.h"
 #import "ZXDMakeOutViewController.h"
-@interface ZXDHomeViewController ()
-
-//@property (nonatomic, strong) MYCycleView *cycleView;
-
+#import "PYSearchSuggestionViewController.h"
+@interface ZXDHomeViewController ()<PYSearchViewControllerDelegate,PYSearchViewControllerDataSource,PYSearchSuggestionViewDataSource>
+//首页    轮播的数据源没有搞好。其他完成
 @property (nonatomic, strong) ZXDCycleData *cycStr;
 @property (nonatomic, strong) ZXDCycleView *cell;
 @property (nonatomic, strong) UITableViewCell *btnCell;
-@property (nonatomic, strong) NSArray *dataArr;
-
+@property (nonatomic, strong) NSMutableArray *dataArr;
+@property (nonatomic, strong) FMDatabaseQueue *queue;
+@property (nonatomic, strong) NSMutableArray *titles;
+@property (nonatomic, strong) PYSearchViewController *searchViewController;
+@property (nonatomic, strong) NSArray *show;
 @end
-//不需要设置btn
-//更换轮播图片
-//btn的图片
-//添加6个btn的内容
 
 @implementation ZXDHomeViewController
 //Btn数据
-- (NSArray *)dataArr
+- (NSMutableArray *)dataArr
 {
     if(!_dataArr){
-        _dataArr = [ZXDRecommendButton mj_objectArrayWithFilename:@"buttons.plist"];
+        _dataArr = [NSMutableArray array];
     }
     return _dataArr;
 }
-
+//标题数据源
+- (NSMutableArray *)titles
+{
+    if(!_titles){
+        _titles = [NSMutableArray array];
+    }
+    return _titles;
+}
+//标题数据源
+- (NSArray *)show
+{
+    if(!_show){
+        _show = [NSArray array];
+    }
+    return _show;
+}
 //轮播数据源
 - (ZXDCycleData *)cycStr
 {
      if (!_cycStr) {
-         ZXDCycleData *temp = [ZXDCycleData cycleWithInit:@"QQ20180404-0" image2:@"QQ20180404-2" image3:@"QQ20180404-3" cellHeight:cellHeight1];
+         ZXDCycleData *temp = [ZXDCycleData cycleWithInit:@"timg" image2:@"54d130e10befb794cf5e5be5a685ae96" image3:@"ba91b30765fa8c67a14614403027c6bb" cellHeight:cellHeight1];
          _cycStr = temp;
      }
     return _cycStr;
@@ -80,14 +95,51 @@ CGFloat cellHeight2 = 110;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     [self setupNavBar];
     
     [self registerTableViewCell];
     //隐藏滚动条
     self.tableView.showsVerticalScrollIndicator = NO;
-   
+
+    //设置button数据源
+    [self setupDB];
+}
+
+-(void)setupDB{
+    //本地文件的路径
+    NSString *string = [[NSBundle mainBundle] pathForResource:@"data" ofType:@"db"];
+    
+    //1.创建数据库队列
+    self.queue = [FMDatabaseQueue databaseQueueWithPath:string];
+    //2.创建表
+    [self.queue inDatabase:^(FMDatabase * _Nonnull db) {
+        BOOL result = [db executeUpdate:@"create table if not exists person (id integer primary key autoincrement, name text, age integer);"];
+        if(result){
+            NSLog(@"创建成功");
+        }else{
+            NSLog(@"创建失败");
+        }
+    }];
+    [self query];
+}
+-(void)query{
+    [self.queue inDatabase:^(FMDatabase * _Nonnull db) {
+        //1.查询数据
+        FMResultSet *rs = [db executeQuery:@"select * from Content"];
+        //2.遍历结果集
+        while(rs.next){
+            ZXDMusic *music = [[ZXDMusic alloc] init];
+            music.music_name = [rs stringForColumn:@"标题"];
+            music.music_image = [rs stringForColumn:@"缩略图"];
+            music.music_bimag = [rs stringForColumn:@"背景图"];
+            music.music_fl = [rs stringForColumn:@"音频"];
+            music.music_id = [rs intForColumn:@"ID"];
+            [self.dataArr addObject:music];
+            [self.titles addObject:music.music_name];
+        }
+    }];
 }
 
 //注册cell
@@ -106,23 +158,50 @@ CGFloat cellHeight2 = 110;
 {
     //右边导航条
     //左边导航条
+    self.navigationItem.rightBarButtonItem = [UIBarButtonItem itemWithTitle:@"搜索" target:self action:@selector(setting)];
     //把UIButton包装成UIButtonItem,导致点击区域变大
-    self.navigationItem.leftBarButtonItem = [UIBarButtonItem itemWithImage:[UIImage imageNamed:@"mine-setting-icon"] highImage:[UIImage imageNamed:@"mine-setting-icon-click"] target:self action:@selector(setting)];
+//    self.navigationItem.leftBarButtonItem = [UIBarButtonItem itemWithImage:[UIImage imageNamed:@"mine-setting-icon"] highImage:[UIImage imageNamed:@"mine-setting-icon-click"] target:self action:@selector(setting)];
     
     //中间导航条
     self.navigationItem.title = @"首页";
 }
 
-#pragma mark - 设置页面跳转
+#pragma mark - 设置搜索跳转
 -(void)setting
 {
-    ZXDSettingViewController *settingVC = [[ZXDSettingViewController alloc] init];
-    
-    settingVC.hidesBottomBarWhenPushed = YES;
-    
-    [self.navigationController pushViewController:settingVC animated:YES];
-}
+    NSArray *hotSeaches = @[@"春晓", @"春夜喜雨", @"绝句", @"江雪", @"游子吟", @"浪淘沙", @"忆江南", @"悯农", @"山行", @"秋夕"];
+    _searchViewController = [PYSearchViewController searchViewControllerWithHotSearches:hotSeaches searchBarPlaceholder:NSLocalizedString(@"请输入诗歌", @"春晓") didSearchBlock:^(PYSearchViewController *searchViewController, UISearchBar *searchBar, NSString *searchText) {
+        //传个对象过去
+        for(int i = 0;i < self.dataArr.count;i++)
+        {
+            ZXDMusic *music = self.dataArr[i];
+            if([searchText isEqualToString:music.music_name])
+            {
+                ZXDRecordViewController *recordVC = [[ZXDRecordViewController alloc] init];
+                recordVC.currentmusic = music;
+                [searchViewController.navigationController pushViewController:recordVC animated:YES];
+            }
+        }
+    }];
+    _searchViewController.dataSource = self;
+    _searchViewController.delegate = self;
+    UINavigationController *nav = [[ZXDNavigationViewController alloc] initWithRootViewController:_searchViewController];
+    [self presentViewController:nav animated:YES completion:nil];
 
+}
+#pragma mark - PYSearchViewControllerDelegate
+- (void)searchViewController:(PYSearchViewController *)searchViewController searchTextDidChange:(UISearchBar *)seachBar searchText:(NSString *)searchText
+{
+    if (searchText.length) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSPredicate * predicate = [NSPredicate  predicateWithFormat:@"SELF CONTAINS %@",searchText];
+            //过滤数据
+            NSMutableArray *searchSuggestionsM = [NSMutableArray array];
+            searchSuggestionsM = [[self.titles filteredArrayUsingPredicate:predicate] mutableCopy];
+            searchViewController.searchSuggestions = searchSuggestionsM;
+        });
+    }
+}
 #pragma mark - tableView
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -139,7 +218,7 @@ CGFloat cellHeight2 = 110;
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    //轮播  已做好
+    //轮播
     UITableViewCell *cell = [[UITableViewCell alloc] init];
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
@@ -151,25 +230,22 @@ CGFloat cellHeight2 = 110;
             return _cell;
         }else if (indexPath.row == 1){
             //首页btn
-            //开始创建首页按钮 1.先看需要创建什么按钮。创建几个？
-            //高度
-            //抽一下
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:piecesID];
             _btnCell = cell;
-            HomeButton *homeBtn = [HomeButton buttonWithType:UIButtonTypeCustom frame:CGRectMake(0, 0, tableView.frame.size.width / 3, cellHeight2) title:@"听一听" titleColor:[UIColor blackColor] titleFont:15 textAlignment:NSTextAlignmentCenter image:[UIImage imageNamed:@"Music"] imageViewContentMode:UIViewContentModeCenter handler:^(UIButton *sender) {
+            HomeButton *homeBtn = [HomeButton buttonWithType:UIButtonTypeCustom frame:CGRectMake(0, 0, tableView.frame.size.width / 3, cellHeight2) title:@"听一听" titleColor:[UIColor blackColor] titleFont:15 textAlignment:NSTextAlignmentCenter image:[UIImage imageNamed:@"音乐"] imageViewContentMode:UIViewContentModeCenter handler:^(UIButton *sender) {
                 [self musicView];
             }];
             
             [cell.contentView addSubview:homeBtn];
             //
-            HomeButton *likeBtn = [HomeButton buttonWithType:UIButtonTypeCustom frame:CGRectMake(homeBtn.frame.size.width, 0,  tableView.frame.size.width / 3, cellHeight2) title:@"读一读" titleColor:[UIColor blackColor] titleFont:15 textAlignment:NSTextAlignmentCenter image:[UIImage imageNamed:@"Apps"] imageViewContentMode:UIViewContentModeCenter handler:^(UIButton *sender) {
+            HomeButton *likeBtn = [HomeButton buttonWithType:UIButtonTypeCustom frame:CGRectMake(homeBtn.frame.size.width, 0,  tableView.frame.size.width / 3, cellHeight2) title:@"读一读" titleColor:[UIColor blackColor] titleFont:15 textAlignment:NSTextAlignmentCenter image:[UIImage imageNamed:@"录音"] imageViewContentMode:UIViewContentModeCenter handler:^(UIButton *sender) {
                 [self recordView];
                 
             }];
             
             [cell.contentView addSubview:likeBtn];
             
-            HomeButton *listBtn = [HomeButton buttonWithType:UIButtonTypeCustom frame:CGRectMake(homeBtn.frame.size.width * 2, 0, tableView.frame.size.width / 3, cellHeight2) title:@"写一写" titleColor:[UIColor blackColor] titleFont:15 textAlignment:NSTextAlignmentCenter image:[UIImage imageNamed:@"Apps"] imageViewContentMode:UIViewContentModeCenter handler:^(UIButton *sender) {
+            HomeButton *listBtn = [HomeButton buttonWithType:UIButtonTypeCustom frame:CGRectMake(homeBtn.frame.size.width * 2, 0, tableView.frame.size.width / 3, cellHeight2) title:@"写一写" titleColor:[UIColor blackColor] titleFont:15 textAlignment:NSTextAlignmentCenter image:[UIImage imageNamed:@"写字"] imageViewContentMode:UIViewContentModeCenter handler:^(UIButton *sender) {
                 [self makeOutView];
                 
             }];
@@ -182,7 +258,8 @@ CGFloat cellHeight2 = 110;
         ZXDRecommendCell *cell = [tableView dequeueReusableCellWithIdentifier:listID];
          cell.selectionStyle = UITableViewCellSelectionStyleNone;
         //让每个Btn不一样
-        for (NSInteger i = 0; i < 6; i ++) {
+        int value = 16;
+        for (NSInteger i = 0; i < 6; i ++,value++) {
             //设置索引
             NSInteger index1 = i;
             //传递索引
@@ -190,9 +267,11 @@ CGFloat cellHeight2 = 110;
             //给每个button设置索引
             [cell.buttom setTag:index1];
             //给每个button设置数据
-            cell.recommendButton = self.dataArr[index1];
+            ZXDMusic *music = self.dataArr[value];
+            cell.zxdMusic = music;
             //获得cell中的button 并给他们添加事件
             HomeButton *homebtn = [cell.btns objectAtIndex:i];
+            homebtn.value = value;
             [homebtn addTarget:self action:@selector(choseTerm:) forControlEvents:UIControlEventTouchUpInside];
         }
         return cell;
@@ -217,53 +296,16 @@ CGFloat cellHeight2 = 110;
     return 100;
 }
 
-//  点击单元格的时候取消选中单元格
-
-//设置tableview头标题
-// 返回组头部view的高度
-//- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
-//
-//
-//    return 0;
-//}
-//tableView样式
-//- (instancetype)initWithStyle:(UITableViewStyle)style {
-//
-//    return [super initWithStyle:UITableViewStyleGrouped];
-//
-//}
-
 #pragma mark - TermCellDelegate
-- (void)choseTerm:(UIButton *)button
+- (void)choseTerm:(HomeButton *)button
 {
-    if (button.tag == 0) {
-        NSLog(@"a a a  a  a ");
-    }else if (button.tag == 1)
-    {
-        NSLog(@"bbbbb");
-    }else
-    {
-        NSLog(@"cccc ");
-    }
+    ZXDMusic *music = self.dataArr[button.value];
+    ZXDGuShiShowViewController *showVC = [[ZXDGuShiShowViewController alloc] init];
+    showVC.music = music;
+    showVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:showVC animated:YES];
 }
 
--(void)buttonTarget:(UIButton *)sender
-{
-    if (sender.tag == 0)
-    {
-        NSLog(@"我是0");
-    }else if (sender.tag == 1){
-        NSLog(@"我是1");
-    }else if (sender.tag == 2){
-        NSLog(@"我是2");
-    }else if (sender.tag == 3){
-        NSLog(@"我是3");
-    }else if (sender.tag == 4){
-        NSLog(@"我是4");
-    }else if (sender.tag == 5){
-        NSLog(@"我是5");
-    }
-}
 #pragma mark - 跳转音乐页
 -(void)musicView
 {

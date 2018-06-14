@@ -30,11 +30,12 @@
 -(void)setMusic:(ZXDMusic *)Music
 {
     _Music = Music;
-    [self.cellImage sd_setImageWithURL:[NSURL URLWithString:Music.img_url] placeholderImage:[UIImage imageNamed:@"f6783ab4fc5ec994ea7a83ed380db7f3"] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-    } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-    }];
-    self.musicSize.text = [NSString stringWithFormat:@"%@",Music.size];
-    self.musicName.text = [NSString stringWithFormat:@"%@",Music.story_name];
+    self.cellImage.image = [UIImage imageNamed:Music.music_image];
+//    [self.cellImage sd_setImageWithURL:[NSURL URLWithString:Music.music_bimag] placeholderImage:[UIImage imageNamed:@"f6783ab4fc5ec994ea7a83ed380db7f3"] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+//    } completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//    }];
+//    self.musicSize.text = [NSString stringWithFormat:@"%@",Music.size];
+    self.musicName.text = [NSString stringWithFormat:@"%ld. %@",(long)Music.music_id,Music.music_name];
     self.playImage.image = [UIImage imageNamed:@"Downloads"];
 }
 

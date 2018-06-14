@@ -46,7 +46,7 @@
 -(void)setSingModel:(ZXDMusic *)singModel
 {
     _singModel = singModel;
-    self.titleLabel.text = singModel.story_name;
+    self.titleLabel.text = singModel.music_name;
 //    self.artistLabel.text = singModel.singer;
 }
 @end

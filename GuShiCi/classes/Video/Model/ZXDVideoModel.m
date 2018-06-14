@@ -9,5 +9,13 @@
 #import "ZXDVideoModel.h"
 
 @implementation ZXDVideoModel
-
++ (instancetype)videoGroupWithDict:(NSDictionary *)dict
+{
+    ZXDVideoModel *group = [[self alloc] init];
+    //    [group setValuesForKeysWithDictionary:dict];
+    group.ID = dict[@"id"];
+    group.url = dict[@"url"];
+    group.name = dict[@"name"]; 
+    return group;
+}
 @end

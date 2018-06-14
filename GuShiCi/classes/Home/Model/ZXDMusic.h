@@ -35,8 +35,9 @@
 //音频
 @property (nonatomic, copy) NSString *music_fl;
 
-
 +(NSString *)initWithStr:(NSString *)rank name:(NSString *)musicName;
+
 +(NSString *)chChangePin:(NSString *)str1;
+
 -(BOOL) isFileExist:(NSString *)fileName;
 @end

@@ -28,31 +28,39 @@ NSString *VID = @"videoID";
 -(NSMutableArray *)videos
 {
     if(!_videos){
-        _videos = [NSMutableArray array];
+        _videos = [ZXDVideoModel mj_objectArrayWithFilename:@"VidoesPlist.plist"];
     }
     return _videos;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupNavBar];
-    ZXDWeak(self);
-    NSDictionary *parameters = @{@"type" : @"JSON"};
-    //显示加载
-    [self showLoading];
-    [[LMJRequestManager sharedManager] GET:[LMJXMGBaseUrl stringByAppendingPathComponent:@"video"] parameters:parameters completion:^(LMJBaseResponse *response) {
-        //完成以后去掉加载
-        [weakself dismissLoading];
-        if (!response.error && response.responseObject) {
-            //请求到了。将视频加入数组之中
-            self.videos = [ZXDVideoModel mj_objectArrayWithKeyValuesArray:response.responseObject[@"videos"]];
-        } else {
-            //失败
-            [weakself.view makeToast:response.errorMsg];
-            return ;
-        }
-        //刷新tableView
-        [weakself.tableView reloadData];
-    }];
+
+    
+    
+    
+    
+    
+    
+    
+//    ZXDWeak(self);
+//    NSDictionary *parameters = @{@"type" : @"JSON"};
+//    //显示加载
+//    [self showLoading];
+//    [[LMJRequestManager sharedManager] GET:[LMJXMGBaseUrl stringByAppendingPathComponent:@"video"] parameters:parameters completion:^(LMJBaseResponse *response) {
+//        //完成以后去掉加载
+//        [weakself dismissLoading];
+//        if (!response.error && response.responseObject) {
+//            //请求到了。将视频加入数组之中
+//            self.videos = [ZXDVideoModel mj_objectArrayWithKeyValuesArray:response.responseObject[@"videos"]];
+//        } else {
+//            //失败
+//            [weakself.view makeToast:response.errorMsg];
+//            return ;
+//        }
+//        //刷新tableView
+//        [weakself.tableView reloadData];
+//    }];
     //1.注册cell
     [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass([ZXDVideoPlayCell class]) bundle:nil] forCellReuseIdentifier:VID];
 }
@@ -97,43 +105,48 @@ NSString *VID = @"videoID";
 {
     return 200;
 }
+
 - (void)myFavoriteCellAddToShoppingCart:(ZXDVideoPlayCell *)cell{
         //那一条cell
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-        NSLog(@"indexPath:%@",indexPath);
         //获取cell的数据
         ZXDVideoModel *video = self.videos[indexPath.row];
     
-        NSString *str = @"http://120.25.226.186:32812/";
-        NSString *str2 = [video.url absoluteString];
-        NSString *Str3 = [str stringByAppendingString:str2];
+    //        NSString *str = @"http://120.25.226.186:32812/";
+    //        NSString *str2 =;
+    //        [[NSBundlemainBundle] pathForResource:@"m"ofType:@"m4a"];
+        NSString *str3 = [[NSBundle mainBundle] pathForResource:video.url ofType:@"mp4"];
+    
+        str3 = [str3 stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"`#%^{}\"[]|\\<> "].invertedSet];
+    //        NSURL *url = [[NSURL alloc] initWithString:str3];
+    //        NSString *Str3 = [str stringByAppendingString:str2];
         // 分辨率字典（key:分辨率名称，value：分辨率url)
-        NSDictionary *dic = @{ @"高清": Str3, @"标清": Str3};
+        NSURL *url = [NSURL fileURLWithPath:str3];
+//        NSDictionary *dic = @{@"高清": url, @"标清": url};
+    
         // 取出字典中的第一视频URL
-        NSURL *videoURL = [NSURL URLWithString:dic.allValues.firstObject];
-        NSLog(@"url:%@",[videoURL absoluteString]);
+//        NSURL *videoURL = [NSURL URLWithString:dic.allValues.firstObject];
+    
+//        NSLog(@"url:%@",[videoURL absoluteString]);
         //生成播放器
         ZFPlayerModel *playerModel = [[ZFPlayerModel alloc] init];
         playerModel.title            = video.name;
-        playerModel.videoURL         = videoURL;
+        playerModel.videoURL         = url;
         playerModel.placeholderImageURLString = video.image.absoluteString;
         playerModel.scrollView       = self.tableView;
         playerModel.indexPath        = indexPath;
         // 赋值分辨率字典
-        playerModel.resolutionDic    = dic;
+//        playerModel.resolutionDic    = dic;
         // player的父视图tag, imageView 199
         playerModel.fatherViewTag    = [cell viewWithTag:199].tag;
 
         // 设置播放控制层和model
         [self.playerView playerControlView:nil playerModel:playerModel];
         // 下载功能
-        self.playerView.hasDownload = YES;
+        self.playerView.hasDownload = NO;
         // 自动播放
         [self.playerView autoPlayTheVideo];
 }
-//- (IBAction)cellBtnclick:(UIButton *)sender {
-//
-//}
 
 #pragma mark - ZFPlayerDelegate
 - (void)zf_playerDownload:(NSString *)url {
@@ -168,7 +181,7 @@ NSString *VID = @"videoID";
 -(void)setupNavBar
 {
     //中间导航条
-    self.navigationItem.title = @"首页";
+    self.navigationItem.title = @"视频";
 }
 #pragma mark - 加载框
 - (void)showLoading

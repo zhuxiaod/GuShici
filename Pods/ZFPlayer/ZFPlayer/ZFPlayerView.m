@@ -341,7 +341,7 @@ typedef NS_ENUM(NSInteger, PanDirection){
 /**
  *  用于cell上播放player
  *
- *  @param tableView tableView
+ *  @param scrollView tableView
  *  @param indexPath indexPath
  */
 - (void)cellVideoWithScrollView:(UIScrollView *)scrollView
@@ -373,7 +373,6 @@ typedef NS_ENUM(NSInteger, PanDirection){
     self.playerItem = [AVPlayerItem playerItemWithAsset:self.urlAsset];
     // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:，该方法阻塞线程
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
-    
     // 初始化playerLayer
     self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
     
@@ -396,6 +395,9 @@ typedef NS_ENUM(NSInteger, PanDirection){
         self.isLocalVideo = YES;
         [self.controlView zf_playerDownloadBtnState:NO];
     } else {
+//        self.state = ZFPlayerStatePlaying;
+//        self.isLocalVideo = YES;
+//        [self.controlView zf_playerDownloadBtnState:NO];
         self.state = ZFPlayerStateBuffering;
         self.isLocalVideo = NO;
         [self.controlView zf_playerDownloadBtnState:YES];

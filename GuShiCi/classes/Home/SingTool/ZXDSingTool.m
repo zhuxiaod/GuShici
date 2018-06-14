@@ -49,14 +49,9 @@ static ZXDMusic *_playingMusic;
 // 返回上一首音乐
 + (ZXDMusic *)previousMusic
 {
-    NSInteger index = [_musics indexOfObject:_playingMusic];
-    
-    //    index -= 1;
-    //    if (index < 0) {
-    //        index = _musics.count - 1;
-    //    }
-    //    CLMusicModel *previousMusic = _musics[index];
-    
+//    NSInteger index = [_musics indexOfObject:_playingMusic];
+    NSInteger index = _playingMusic.music_id;
+    index = index - 1;
     if (index == 0) {
         index = _musics.count -1;
     }else{
@@ -69,11 +64,14 @@ static ZXDMusic *_playingMusic;
 // 返回下一首音乐
 + (ZXDMusic *)nextMusic
 {
-    NSInteger index = [_musics indexOfObject:_playingMusic];
+    //index取东西越界
+//    NSInteger index = [_musics indexOfObject:_playingMusic];
+    NSInteger index = _playingMusic.music_id;
+    index = index - 1;
     if (index == _musics.count - 1) {
         index = 0;
     }else{
-        index = index +1;
+        index = index + 1;
     }
     ZXDMusic *previousMusic = _musics[index];
     return previousMusic;

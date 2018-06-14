@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 typedef void(^tapHandler)(UIButton *sender);
-
 @interface HomeButton : UIButton
 
 @property (nonatomic,strong)tapHandler handler;
+@property (nonatomic,assign)int value;
+
 
 
 @property (nonatomic, copy) NSString *tittle;

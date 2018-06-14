@@ -23,9 +23,9 @@
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     
     //2.设置窗口根控制器
-    ZXDTabBarViewController *tabBarVc = [[ZXDTabBarViewController alloc] init];
-    //    ZXDAdViewController *adVc = [[ZXDAdViewController alloc]init];
-    self.window.rootViewController = tabBarVc;
+//    ZXDTabBarViewController *tabBarVc = [[ZXDTabBarViewController alloc] init];
+        ZXDAdViewController *adVc = [[ZXDAdViewController alloc]init];
+    self.window.rootViewController = adVc;
     
     //3.显示窗口    1.成为UIApplocation主窗口 2.
     [self.window makeKeyAndVisible];

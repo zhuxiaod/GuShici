@@ -17,7 +17,8 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    // Initialization code
+    //添加圆角和边线
+//    _music_image
 }
 
 -(void)setMusic:(ZXDMusic *)Music

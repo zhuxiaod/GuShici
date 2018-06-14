@@ -61,12 +61,12 @@ static NSString *hanZiCell = @"hanZiCell";
         height = _dataArray.count/5;
     }
     //分割线
-//    UIView *view1 = [[UIView alloc] initWithFrame:CGRectMake(0, 63,ZXDScreenW,1 )];
-//    view1.backgroundColor = [UIColor grayColor];
-//    [self.view addSubview:view1];
-//    UIView *view2 = [[UIView alloc] initWithFrame:CGRectMake(0, height*100+1,ZXDScreenW,1 )];
-//    view2.backgroundColor = [UIColor grayColor];
-//    [self.view addSubview:view2];
+    UIView *view1 = [[UIView alloc] initWithFrame:CGRectMake(0, 63,ZXDScreenW,1 )];
+    view1.backgroundColor = [UIColor grayColor];
+    [self.view addSubview:view1];
+    UIView *view2 = [[UIView alloc] initWithFrame:CGRectMake(0, height*100+70,ZXDScreenW,1 )];
+    view2.backgroundColor = [UIColor grayColor];
+    [self.view addSubview:view2];
     UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 64, ZXDScreenW, height * 100) collectionViewLayout:layout];
     collectionView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:collectionView];
@@ -84,9 +84,6 @@ static NSString *hanZiCell = @"hanZiCell";
     
     ZXDHanZiCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:hanZiCell forIndexPath:indexPath];
     ZXDHanZi *hanzi = self.dataArray[indexPath.row];
-    if (indexPath.row == 18 || indexPath.row == 19) {
-        NSLog(@"------18---19--%@",hanzi);
-    }
     cell.image = hanzi.image;
     return cell;
 }
